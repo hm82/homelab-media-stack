@@ -1,0 +1,10 @@
+defaults:
+  album: Singles
+
+coke_studio:
+  album_artist: Coke Studio Pakistan
+
+cleanup_patterns:
+  - '\[[^]]+\]'
+  - '\([0-9]+\)'
+  - '_[0-9]{12,}'

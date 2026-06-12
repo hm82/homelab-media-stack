@@ -1,0 +1,119 @@
+# --------------------------------------------------
+# Private / Local-only media-stack content
+# --------------------------------------------------
+
+# Environment
+.env
+.env.*
+*.env
+
+# Backups
+backups/
+*.bak
+*.backup
+*.old
+*.orig
+*.tar.gz
+
+# Archived / deprecated scripts
+scripts/music/archive/
+scripts/music/legacy/
+
+# Future downloaders
+*ytdlp*
+*yt-dlp*
+*downloader*
+
+# Local reports
+album-summary.txt
+folder-tree.txt
+album-preview.txt
+shazam-repair-report.txt
+various-artists-analysis.txt
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Music collections
+Music/
+Downloads/
+_imports/
+_incomplete/
+music-inbox/
+music-staging/
+music-imported/
+music-quarantine/
+
+# Media
+*.mp3
+*.flac
+*.m4a
+*.wma
+*.wav
+*.aac
+*.ogg
+*.opus
+*.cue
+*.jpg
+*.jpeg
+*.png
+*.mp4
+*.mkv
+*.avi
+*.mov
+
+# Secrets / local config
+.env
+*.env
+.env.*
+secrets.*
+credentials.*
+tokens.*
+*.key
+*.pem
+*.crt
+
+# Backups / archives
+backups/
+*.bak
+*.backup
+*.old
+*.orig
+archive/
+legacy/
+deprecated/
+scratch/
+tmp/
+.cache/
+
+# Logs / reports
+*.log
+*.out
+album-summary.txt
+folder-tree.txt
+album-preview.txt
+various-artists-analysis.txt
+shazam-repair-report.txt
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+*.egg-info/
+
+# Node / general
+node_modules/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swoa
+
+# Local maintainer tools
+.local/

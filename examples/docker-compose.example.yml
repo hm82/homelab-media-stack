@@ -1,0 +1,250 @@
+services:
+  jellyseerr:
+    image: ghcr.io/fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    environment:
+      - TZ=${TZ}
+    volumes:
+      - /opt/jellyseerr:/app/config
+    ports:
+      - "${JELLYSEERR_PORT:-5055}:5055"
+    restart: unless-stopped
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /opt/radarr:/config
+      - /mnt/media/_downloads:/downloads
+      - /mnt/media:/mnt/media
+    ports:
+      - "${RADARR_PORT:-7878}:7878"
+    restart: unless-stopped
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /opt/sonarr:/config
+      - /mnt/media/_downloads:/downloads
+      - /mnt/media:/mnt/media
+    ports:
+      - "${SONARR_PORT:-8989}:8989"
+    restart: unless-stopped
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /opt/prowlarr:/config
+    ports:
+      - "${PROWLARR_PORT:-9696}:9696"
+    restart: unless-stopped
+
+  navidrome:
+    image: deluan/navidrome:latest
+    container_name: navidrome
+    ports:
+      - "${NAVIDROME_PORT:-4533}:4533"
+    environment:
+      - ND_MUSICFOLDER=/music
+      - ND_DATAFOLDER=/data
+      - ND_LOGLEVEL=info
+    # Enable browser playback for FLAC and other unsupported formats
+      - ND_DEFAULTTRANSCODINGFORMAT=mp3
+      - ND_TRANSCODINGCACHESIZE=2GB
+    volumes:
+      - /mnt/media/Music:/music
+      - /opt/navidrome:/data
+    restart: unless-stopped
+
+  calibre-web:
+    image: lscr.io/linuxserver/calibre-web:latest
+    container_name: calibre-web
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - DOCKER_MODS=linuxserver/mods:universal-calibre
+    volumes:
+      - /mnt/media/config/calibre-web:/config
+      - /mnt/media/Books/CalibreLibrary:/books
+      - /mnt/media/Books/_incoming/ebooks:/incoming
+    ports:
+      - "${CALIBREWEB_PORT:-8083}:8083"
+    restart: unless-stopped
+
+  lazylibrarian:
+    image: lscr.io/linuxserver/lazylibrarian:latest
+    container_name: lazylibrarian
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /mnt/media/config/lazylibrarian:/config
+      - /mnt/media/Books:/books
+      - /mnt/media/_downloads:/downloads
+    ports:
+      - "${LAZYLIBRARIAN_PORT:-5299}:5299"
+    restart: unless-stopped      
+
+  audiobookshelf:
+    image: ghcr.io/advplyr/audiobookshelf:latest
+    container_name: audiobookshelf
+    environment:
+      - TZ=${TZ}
+    volumes:
+      - /mnt/media/config/audiobookshelf:/config
+      - /mnt/media/config/audiobookshelf/metadata:/metadata
+      - /mnt/media/Books/Audiobooks:/audiobooks
+      - /mnt/media/Podcasts:/podcasts
+    ports:
+      - "${AUDIOBOOKSHELF_PORT:-13378}:80"
+    restart: unless-stopped
+
+  slskd:
+    image: slskd/slskd:latest
+    container_name: slskd
+    network_mode: "service:gluetun"
+    depends_on:
+      - gluetun
+    restart: unless-stopped
+
+    environment:
+      - SLSKD_REMOTE_CONFIGURATION=true
+      - TZ=${TZ}
+
+    volumes:
+      - /mnt/media/config/slskd:/app
+      - /mnt/media/_downloads/music:/downloads
+      - /mnt/media/Music:/music      
+
+  gluetun:
+    image: qmcgaw/gluetun:latest
+    container_name: gluetun
+    hostname: gluetun
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    restart: unless-stopped
+
+    ports:
+      # slskd
+      - "${SLSKD_PORT:-5030}:5030"    # Web UI
+      - "${SOULSEEK_PORT:-5031}:5031" # Soulseek listening port
+
+      # qBittorrent Web UI
+      - "${QBITTORRENT_PORT:-8082}:8082"
+
+      # qBittorrent incoming port
+      - "${QBITTORRENT_TCP_PORT:-54246}:54246/tcp"
+      - "${QBITTORRENT_UDP_PORT:-54246}:54246/udp"
+
+    environment:
+      - VPN_SERVICE_PROVIDER=custom
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=${WIREGUARD_PRIVATE_KEY}
+      - WIREGUARD_ADDRESSES=${WIREGUARD_ADDRESSES}
+      - WIREGUARD_PUBLIC_KEY=${WIREGUARD_PUBLIC_KEY}
+      - WIREGUARD_ENDPOINT_IP=${WIREGUARD_ENDPOINT_IP}
+      - WIREGUARD_ENDPOINT_PORT=${WIREGUARD_ENDPOINT_PORT}
+      - WIREGUARD_ALLOWED_IPS=0.0.0.0/0,::/0
+      - TZ=${TZ}
+
+      # Allow LAN + Tailscale access
+      - FIREWALL_OUTBOUND_SUBNETS=${FIREWALL_OUTBOUND_SUBNETS}
+
+    volumes:
+      - /mnt/media/config/gluetun:/gluetun
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    network_mode: "service:gluetun"
+    depends_on:
+      - gluetun
+    restart: unless-stopped
+
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - WEBUI_PORT=8082
+
+    volumes:
+      - /mnt/media/config/qbittorrent:/config
+      - /mnt/media/_downloads:/downloads
+      - /mnt/media/_incomplete:/incomplete
+
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    restart: unless-stopped
+
+    environment:
+      - LOG_LEVEL=info
+      - LOG_HTML=false
+      - CAPTCHA_SOLVER=none
+      - TZ=${TZ}
+
+    ports:
+      - "${FLARESOLVERR_PORT:-8191}:8191"        
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8191/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Service Monitoring and Dashboard 
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    restart: unless-stopped
+    ports:
+      - "${HOMEPAGE_PORT:-3000}:3000"
+    volumes:
+      - /mnt/media/config/homepage:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /:/host/root:ro
+      - /mnt/media:/mnt/media:ro        
+    environment:
+      TZ: ${TZ}
+      HOMEPAGE_ALLOWED_HOSTS: ${HOMEPAGE_ALLOWED_HOSTS}
+
+  uptime-kuma:
+    image: louislam/uptime-kuma:latest
+    container_name: uptime-kuma
+    restart: unless-stopped
+    ports:
+      - "${UPTIMEKUMA_PORT:-3001}:3001"
+    volumes:
+      - /mnt/media/config/uptime-kuma:/app/data
+    environment:
+      TZ: ${TZ}
+
+  glances:
+    image: nicolargo/glances:latest
+    container_name: glances
+    restart: unless-stopped
+    pid: host
+    network_mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /:/rootfs:ro
+    environment:
+      - GLANCES_OPT=-w        

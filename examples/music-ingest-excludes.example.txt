@@ -1,0 +1,11 @@
+# Directory names to exclude anywhere in the source tree
+incomplete
+.incomplete
+tmp
+temp
+partial
+.partial
+@eaDir
+.Trash-1000
+$RECYCLE.BIN
+System Volume Information
