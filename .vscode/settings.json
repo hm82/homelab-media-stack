@@ -1,0 +1,17 @@
+{
+  "search.exclude": {
+    "**/.git": true,
+    "**/__pycache__": true,
+    "**/.venv": true,
+    "**/*.mp3": true,
+    "**/*.flac": true,
+    "**/*.m4a": true
+  },
+
+  "files.watcherExclude": {
+    "**/.git/**": true,
+    "/mnt/media/**": true
+  },
+
+  "editor.formatOnSave": true
+}

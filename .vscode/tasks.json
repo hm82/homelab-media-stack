@@ -1,0 +1,15 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Music Pipeline",
+            "type": "shell",
+            "command": "./scripts/music/run_music_pipeline.zsh"
+        },
+        {
+            "label": "Audit Music Metadata",
+            "type": "shell",
+            "command": "./scripts/music/audit_music_pipeline.zsh"
+        }
+    ]
+}
