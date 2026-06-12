@@ -44,7 +44,8 @@ export DRY_RUN="${DRY_RUN:-false}"
 SOURCE_DIR="${1:-/mnt/media/_downloads/music}"
 INBOX_DIR="/mnt/media/_downloads/music-inbox"
 
-START_TIME=$SECONDS
+SECONDS=0
+PIPELINE_START_TS="$(date '+%F %T')"
 
 REPORT_DIR="/mnt/media/_downloads/reports/music-pipeline/$RUN_ID"
 LOG_DIR="/mnt/media/_downloads/logs/music-pipeline/$RUN_ID"
@@ -69,12 +70,17 @@ run_stage() {
   log "Completed: $stage"
 }
 
-trap 'echo "ERROR: Music pipeline failed at line $LINENO. Run ID: $RUN_ID" >&2' ERR
+trap '
+echo ""
+echo "ERROR: Music pipeline failed"
+echo "Line: $LINENO"
+echo "Run ID: $RUN_ID"
+' ERR
 
 # Pipeline Manifest
 cat > "$REPORT_DIR/pipeline-manifest.txt" <<MANIFEST
 RUN_ID=$RUN_ID
-START=$(date)
+START=$PIPELINE_START_TS
 HOST=$(hostname)
 SOURCE_DIR=$SOURCE_DIR
 INBOX_DIR=$INBOX_DIR
@@ -154,9 +160,12 @@ else
   log "Skipping audit stage."
 fi
 
+ELAPSED_SECONDS=$SECONDS
+PIPELINE_END_TS="$(date '+%F %T')"
+
 cat >> "$REPORT_DIR/pipeline-manifest.txt" <<MANIFEST
-END=$(date)
-ELAPSED_SECONDS=$((SECONDS - START_TIME))
+END=$PIPELINE_END_TS
+ELAPSED_SECONDS=$ELAPSED_SECONDS
 MANIFEST
 
 echo ""
@@ -167,4 +176,3 @@ echo "Elapsed: ${ELAPSED_SECONDS}s"
 echo "Reports: $REPORT_DIR"
 echo "Logs:    $LOG_DIR"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "Elapsed: $((SECONDS - START_TIME)) seconds"
