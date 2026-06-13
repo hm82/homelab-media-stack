@@ -17,11 +17,11 @@ The recommended workflow is:
 ```text
 Downloads
     ↓
-ingest_music_downloads.zsh
+02_ingest_music.zsh
     ↓
 music-inbox
     ↓
-organize_music_library.zsh
+04_organize_music.zsh
     ↓
 music-staging
     ↓
@@ -55,11 +55,11 @@ Example:
 | Script | Purpose |
 |----------|----------|
 | `run_music_pipeline.zsh` | End-to-end music ingestion pipeline |
-| `ingest_music_downloads.zsh` | Moves completed audio files into the inbox while skipping incomplete downloads |
-| `organize_music_library.zsh` | Organizes music into album structures suitable for Beets import |
+| `02_ingest_music.zsh` | Moves completed audio files into the inbox while skipping incomplete downloads |
+| `04_organize_music.zsh` | Organizes music into album structures suitable for Beets import |
 | `import_beets_library.zsh` | Imports organized music into the Beets library |
-| `audit_music_pipeline.zsh` | Generates post-run audit and reporting information |
-| `analyze_music_directory.zsh` | Analyzes directory contents and media distribution |
+| `06_audit_music_library.zsh` | Generates post-run audit and reporting information |
+| `01_analyze_music.zsh` | Analyzes directory contents and media distribution |
 | `inspect_music_metadata.zsh` | Inspects metadata for files and directories |
 | `repair_music_metadata.zsh` | Experimental metadata repair and reporting utility |
 
@@ -103,13 +103,13 @@ Music/
 ### Analyze Downloads
 
 ```bash
-./analyze_music_directory.zsh /mnt/media/_downloads/music
+./01_analyze_music.zsh /mnt/media/_downloads/music
 ```
 
 ### Ingest Only
 
 ```bash
-./ingest_music_downloads.zsh /mnt/media/_downloads/music
+./02_ingest_music.zsh /mnt/media/_downloads/music
 ```
 
 ### Rebuild Staging
@@ -118,7 +118,7 @@ Music/
 rm -rf /mnt/media/_downloads/music-staging
 mkdir -p /mnt/media/_downloads/music-staging
 
-./organize_music_library.zsh
+./04_organize_music.zsh
 ```
 
 ### Inspect Unknown Metadata
@@ -152,7 +152,7 @@ tail -n +2 \
 
 ## Metadata Handling
 
-`organize_music_library.zsh` uses embedded metadata in the following order:
+`04_organize_music.zsh` uses embedded metadata in the following order:
 
 1. Album Artist
 2. Artist (fallback)
@@ -236,7 +236,7 @@ grep "unreadable file:" \
 rm -rf /mnt/media/_downloads/music-staging
 mkdir -p /mnt/media/_downloads/music-staging
 
-./organize_music_library.zsh
+./04_organize_music.zsh
 ```
 
 ---
@@ -259,16 +259,16 @@ mkdir -p /mnt/media/_downloads/music-staging
 The following scripts are considered the primary pipeline:
 
 ```text
-ingest_music_downloads.zsh
-organize_music_library.zsh
+02_ingest_music.zsh
+04_organize_music.zsh
 import_beets_library.zsh
-audit_music_pipeline.zsh
+06_audit_music_library.zsh
 ```
 
 Useful supporting utilities:
 
 ```text
-analyze_music_directory.zsh
+01_analyze_music.zsh
 inspect_music_metadata.zsh
 audit_music_tags.sh
 summarize_album_artists.sh

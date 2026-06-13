@@ -9,7 +9,7 @@
         {
             "label": "Audit Music Metadata",
             "type": "shell",
-            "command": "./scripts/music/audit_music_pipeline.zsh"
+            "command": "./scripts/music/06_audit_music_library.zsh"
         }
     ]
 }
