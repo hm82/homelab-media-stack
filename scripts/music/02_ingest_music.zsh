@@ -17,6 +17,15 @@
 # Optional:
 #   DRY_RUN=true 02_ingest_music.zsh
 #
+#
+# TODO:
+# Move matching .lrc sidecars alongside audio files.
+# Example:
+#   song.flac
+#   song.lrc
+#
+# Both should be ingested together.
+# 
 
 set -euo pipefail
 
@@ -167,11 +176,11 @@ folder_has_audio_before_move() {
 }
 
 path_has_excluded_dir() {
-  local path="$1"
+  local file_path="$1"
   local d
 
   for d in "${EXCLUDED_DIRS[@]}"; do
-    [[ "$path" == *"/$d/"* ]] && return 0
+    [[ "$file_path" == *"/$d/"* ]] && return 0
   done
 
   return 1
@@ -182,7 +191,7 @@ file_matches_excluded_pattern() {
   local base
   local p
 
-  base="$(basename -- "$file")"
+  base="${file:t}"
 
   for p in "${EXCLUDED_FILES[@]}"; do
     [[ "$base" == ${~p} ]] && return 0
@@ -192,13 +201,13 @@ file_matches_excluded_pattern() {
 }
 
 is_excluded_path() {
-  local path="$1"
+  local file_path="$1"
 
-  if path_has_excluded_dir "$path"; then
+  if path_has_excluded_dir "$file_path"; then
     return 0
   fi
 
-  if file_matches_excluded_pattern "$path"; then
+  if file_matches_excluded_pattern "$file_path"; then
     return 0
   fi
 
@@ -206,11 +215,11 @@ is_excluded_path() {
 }
 
 exclusion_reason() {
-  local path="$1"
+  local file_path="$1"
   local d p base
 
   for d in "${EXCLUDED_DIRS[@]}"; do
-    if [[ "$path" == *"/$d/"* ]]; then
+    if [[ "$file_path" == *"/$d/"* ]]; then
       print -r -- "excluded-directory:$d"
       return
     fi

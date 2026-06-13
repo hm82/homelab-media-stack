@@ -399,3 +399,19 @@ mkdir -p /mnt/media/_downloads/music-staging
 ./test.zsh
 ```
 ---
+## Roadmap
+
+### Pipeline
+
+- [ ] Stage 03 metadata enrichment framework
+- [ ] Album name normalization
+- [ ] Sidecar (.lrc) ingestion support
+- [ ] Duplicate scoring and recommendations
+- [ ] End-to-end pipeline test fixtures
+
+### Quality
+
+- [ ] Metadata consistency reporting
+- [ ] Album completeness validation
+- [ ] Navidrome library verification
+---
